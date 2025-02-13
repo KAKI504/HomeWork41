@@ -1,4 +1,4 @@
-import Server.EchoWar;
+package Server;
 
 
 public class Main {
