@@ -20,6 +20,7 @@ public class EchoClient {
 
     public void run() {
         System.out.println("для выхода напиши 'bye'");
+        System.out.println("Доступные команды: date, time, reverse, upper, bye");
 
         try (Socket socket = new Socket(host, port)) {
             System.out.println("Connected to server on port " + port);
@@ -34,20 +35,16 @@ public class EchoClient {
 
             try (userInput; writer; reader) {
                 while (true) {
-                    System.out.print("Enter message: ");
+                    System.out.print("Enter command: ");
                     String message = userInput.nextLine();
                     writer.println(message);
 
                     String response = reader.readLine();
                     if (response != null) {
-                        System.out.println("Server sent reversed message: " + response);
+                        System.out.println("Server response: " + response);
                     }
 
                     if (message.equalsIgnoreCase("bye")) {
-                        response = reader.readLine();
-                        if (response != null) {
-                            System.out.println("Server's goodbye: " + response);
-                        }
                         return;
                     }
                 }
