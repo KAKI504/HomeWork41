@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
+      <module fileurl="file://$PROJECT_DIR$/../HomewWork41_2_EchoClient/Echoclient/Echoclient.iml" filepath="$PROJECT_DIR$/../HomewWork41_2_EchoClient/Echoclient/Echoclient.iml" />
       <module fileurl="file://$PROJECT_DIR$/HomewWork41_2.iml" filepath="$PROJECT_DIR$/HomewWork41_2.iml" />
     </modules>
   </component>

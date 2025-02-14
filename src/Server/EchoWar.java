@@ -11,10 +11,6 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-interface Command {
-    String execute(String message);
-}
-
 public class EchoWar {
     private final int port;
     private final Map<String, Command> commands = new HashMap<>();
@@ -25,17 +21,42 @@ public class EchoWar {
     }
 
     private void initCommands() {
-        commands.put("date", msg -> LocalDate.now().format(DateTimeFormatter.ISO_DATE));
-        commands.put("time", msg -> LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss")));
-        commands.put("reverse", msg -> {
-            String[] parts = msg.split(" ", 2);
-            return parts.length > 1 ? new StringBuilder(parts[1]).reverse().toString() : "";
+        commands.put("Дата", new Command() {
+            @Override
+            public String execute(String message) {
+                return LocalDate.now().format(DateTimeFormatter.ISO_DATE);
+            }
         });
-        commands.put("upper", msg -> {
-            String[] parts = msg.split(" ", 2);
-            return parts.length > 1 ? parts[1].toUpperCase() : "";
+
+        commands.put("время", new Command() {
+            @Override
+            public String execute(String message) {
+                return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
+            }
         });
-        commands.put("bye", msg -> "Goodbye!");
+
+        commands.put("реверс", new Command() {
+            @Override
+            public String execute(String message) {
+                String[] parts = message.split(" ", 2);
+                return parts.length > 1 ? new StringBuilder(parts[1]).reverse().toString() : "";
+            }
+        });
+
+        commands.put("верхний", new Command() {
+            @Override
+            public String execute(String message) {
+                String[] parts = message.split(" ", 2);
+                return parts.length > 1 ? parts[1].toUpperCase() : "";
+            }
+        });
+
+        commands.put("пока", new Command() {
+            @Override
+            public String execute(String message) {
+                return "До свидания!";
+            }
+        });
     }
 
     public static EchoWar blindToPort(int port) {
@@ -44,17 +65,17 @@ public class EchoWar {
 
     public void run() {
         try (ServerSocket server = new ServerSocket(port)) {
-            System.out.println("Server started on port " + port);
-            System.out.println("Available commands: date, time, reverse, upper, bye");
+            System.out.println("Сервер запущен на порту " + port);
+            System.out.println("Доступные команды: Дата, время, реверс, верхний, пока");
 
             while (true) {
                 try (Socket socket = server.accept()) {
-                    System.out.println("New client connected!");
+                    System.out.println("Новый клиент подключился!");
                     handle(socket);
                 }
             }
         } catch (IOException e) {
-            System.out.printf("Вероятное всего порт %s занят.%n", port);
+            System.out.printf("Вероятнее всего порт %s занят.%n", port);
             e.printStackTrace();
         }
     }
@@ -68,27 +89,27 @@ public class EchoWar {
         try (Scanner scanner = new Scanner(isr); writer) {
             while (true) {
                 String message = scanner.nextLine().strip();
-                System.out.printf("Got: %s%n", message);
+                System.out.printf("Получено: %s%n", message);
 
                 String[] parts = message.split(" ", 2);
-                String command = parts[0].toLowerCase();
+                String command = parts[0];
 
                 String response;
                 if (commands.containsKey(command)) {
                     response = commands.get(command).execute(message);
-                    if (command.equals("bye")) {
+                    if (command.equals("пока")) {
                         writer.println(response);
-                        System.out.println("Client disconnected");
+                        System.out.println("Клиент отключился");
                         return;
                     }
                 } else {
-                    response = message;
+                    response = new StringBuilder(message).reverse().toString();
                 }
 
                 writer.println(response);
             }
         } catch (NoSuchElementException e) {
-            System.out.println("Client dropped connection");
+            System.out.println("Клиент прервал соединение");
         }
     }
 }
